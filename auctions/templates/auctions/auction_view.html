@@ -1,0 +1,17 @@
+{% extends "auctions/layout.html" %} {% block body %}
+
+<div>
+  <h4 style="text-align: center">{{ auction.lot }}</h4>
+
+  <img
+    src="/static/{{auction.image.name}}"
+    alt="Photo of object"
+    style="width: 200px; display: block; margin-left: auto; margin-right: auto"
+  />
+
+  <p style="text-align: center">{{ auction.description }}</p>
+  <br />
+  <h6 style="text-align: center">Price {{ auction.first_rate }}</h6>
+</div>
+
+{% endblock %}
