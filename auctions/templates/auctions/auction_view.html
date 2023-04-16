@@ -1,6 +1,6 @@
 {% extends "auctions/layout.html" %} {% block body %}
 
-<div>
+
   <h4 style="text-align: center">{{ auction.lot }}</h4>
 
   <img
@@ -11,9 +11,19 @@
 
   <p style="text-align: center">{{ auction.description }}</p>
   <br />
-  <h6 style="text-align: center">Price {{ auction.first_rate }}</h6>
+  <h6 style="text-align: center">Price {{ rate.current_rate }}</h6>
 
+  <div>
+  <form action="{% url 'new_rate' category_id=auction.category_id.id auction_id=auction.id %}" method="post">
 
+        {% csrf_token %}
+        {{ rate_form.as_p }}
+        <input type="submit" value="Make rate">
+
+  </form>
+  </div>
+
+<!-- Watchlist form operations -->
 {% if wlist.first == None %}
 
   <form action="{% url 'into_watchlist' category_id=auction.category_id.id auction_id=auction.id %}"
@@ -32,7 +42,6 @@
       <input type="submit" value="Do not track">
   </form>
 
-</div>
 {% endif %}
 
 {% endblock %}

@@ -40,7 +40,7 @@ class Comment(models.Model):
 
 
 class Rate(models.Model):
-    current_rate = models.IntegerField()
+    current_rate = models.IntegerField(verbose_name="Rate size")
     lot_id = models.ForeignKey(
         Auction, on_delete=models.CASCADE, related_name="auctions")
     user_id = models.ForeignKey(

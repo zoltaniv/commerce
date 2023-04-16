@@ -120,10 +120,11 @@ def new_auction(request):
     
 def auction_view(request, category_id, auction_id):
     auction = Auction.objects.filter(id=auction_id).first()
-    
     wlist = Watchlist.objects.filter(user=request.user.id, auction=auction_id)
+    newrate = Rate.objects.filter(lot_id= auction_id).last()
     
-    return render(request, "auctions/auction_view.html", {"auction": auction, "wlist": wlist})
+    return render(request, "auctions/auction_view.html", {
+        "auction": auction, "wlist": wlist, "rate_form": RateForm(), "rate": rate})
 
 
 def into_watchlist(request, category_id, auction_id):
@@ -138,3 +139,15 @@ def out_watchlist(request, category_id, auction_id):
     wlist.delete()
     
     return redirect(reverse("auction_view", args=[category_id, auction_id]))
+
+
+def new_rate(request, category_id, auction_id):
+    rate = Rate(
+        current_rate= request.POST.get("current_rate"),
+        lot_id= Auction(auction_id),
+        user_id= User(request.user.id)
+        )
+    rate.save()
+    
+    return redirect(reverse("auction_view", args=[category_id, auction_id]))
+    
