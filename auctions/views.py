@@ -7,7 +7,7 @@ from django import forms
 from django.forms import ModelForm, Textarea
 from django.db import models
 
-from .models import User, Auction, Category
+from .models import User, Auction, Category, Watchlist,Rate
 
 
 class AuctionForm(ModelForm):
@@ -20,6 +20,12 @@ class AuctionForm(ModelForm):
             "cols": 50,
             "style": "resize: none;"
             })}
+        
+class RateForm(ModelForm):
+    class Meta:
+        model = Rate
+        fields = ["current_rate"]
+        
 
 
 def index(request):
@@ -115,4 +121,20 @@ def new_auction(request):
 def auction_view(request, category_id, auction_id):
     auction = Auction.objects.filter(id=auction_id).first()
     
-    return render(request, "auctions/auction_view.html", {"auction": auction})
+    wlist = Watchlist.objects.filter(user=request.user.id, auction=auction_id)
+    
+    return render(request, "auctions/auction_view.html", {"auction": auction, "wlist": wlist})
+
+
+def into_watchlist(request, category_id, auction_id):
+    wlist = Watchlist(user=User(request.user.id), auction=Auction(request.POST.get("auction")))
+    wlist.save()
+    
+    return redirect(reverse("auction_view", args=[category_id, auction_id]))
+
+
+def out_watchlist(request, category_id, auction_id):
+    wlist = Watchlist.objects.filter(user=request.user.id, auction=auction_id)
+    wlist.delete()
+    
+    return redirect(reverse("auction_view", args=[category_id, auction_id]))

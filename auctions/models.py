@@ -51,7 +51,5 @@ class Rate(models.Model):
 
 
 class Watchlist(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="someusers")
-    auction = models.ForeignKey(
-        Auction, on_delete=models.CASCADE, related_name="someauctions")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="someusers")
+    auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name="someauctions")

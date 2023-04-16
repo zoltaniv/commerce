@@ -12,6 +12,27 @@
   <p style="text-align: center">{{ auction.description }}</p>
   <br />
   <h6 style="text-align: center">Price {{ auction.first_rate }}</h6>
+
+
+{% if wlist.first == None %}
+
+  <form action="{% url 'into_watchlist' category_id=auction.category_id.id auction_id=auction.id %}"
+    method="post">
+      {% csrf_token %}
+      <input type="hidden" name="auction" value="{{ auction.id }}">
+      <input type="submit" value="Track">
+  </form>
+
+{% else %}
+
+   <form action="{% url 'out_watchlist' category_id=auction.category_id.id auction_id=auction.id %}"
+    method="post">
+      {% csrf_token %}
+      <input type="hidden" name="auction" value="{{ auction.id }}">
+      <input type="submit" value="Do not track">
+  </form>
+
 </div>
+{% endif %}
 
 {% endblock %}
