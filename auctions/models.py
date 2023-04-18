@@ -21,10 +21,10 @@ class Auction(models.Model):
     description = models.TextField(verbose_name="Description of product")
     first_rate = models.IntegerField(verbose_name="Price of product")
     category_id = models.ForeignKey(
-        Category, on_delete=models.CASCADE, related_name="categories", verbose_name="Product categories")
+        Category, on_delete=models.CASCADE, related_name="catauctions", verbose_name="Product categories")
     image = models.ImageField(upload_to='auctions/images')
     user_id = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="users")
+        User, on_delete=models.CASCADE, related_name="useauctions")
 
     def __str__(self):
         return f"{self.id} {self.category_id} {self.lot} {self.description} {self.first_rate}"
@@ -33,7 +33,7 @@ class Auction(models.Model):
 class Comment(models.Model):
     annotation = models.CharField(max_length=256)
     user_id = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="persons")
+        User, on_delete=models.CASCADE, related_name="comments")
 
     def __str__(self):
         return f"{self.id} {self.annotation} {self.user_id}"
@@ -42,14 +42,14 @@ class Comment(models.Model):
 class Rate(models.Model):
     current_rate = models.IntegerField(verbose_name="Rate size")
     lot_id = models.ForeignKey(
-        Auction, on_delete=models.CASCADE, related_name="auctions")
+        Auction, on_delete=models.CASCADE, related_name="aucrates")
     user_id = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="members")
+        User, on_delete=models.CASCADE, related_name="userates")
 
     def __str__(self):
         return f"{self.id} {self.current_rate} {self.lot_id} {self.user_id}"
 
 
 class Watchlist(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="someusers")
-    auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name="someauctions")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="usewlist")
+    auction = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name="aucwlist")

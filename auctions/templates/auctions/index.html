@@ -14,7 +14,7 @@
 
             <p style="text-align: center;">{{ auction.description }}</p>
             <br>
-            <h6 style="text-align: center;">Price {{ auction.first_rate }}</h6>
+            <h6 style="text-align: center;">Price {{ auction.aucrates.last.current_rate }}</h6>
 
         </div>
     {% endfor %}

@@ -1,47 +1,47 @@
 {% extends "auctions/layout.html" %} {% block body %}
 
+<h4 style="text-align: center">{{ auction.lot }}</h4>
 
-  <h4 style="text-align: center">{{ auction.lot }}</h4>
+<img
+  src="/static/{{auction.image.name}}"
+  alt="Photo of object"
+  style="width: 200px; display: block; margin-left: auto; margin-right: auto"
+/>
 
-  <img
-    src="/static/{{auction.image.name}}"
-    alt="Photo of object"
-    style="width: 200px; display: block; margin-left: auto; margin-right: auto"
-  />
+<p style="text-align: center;">{{ auction.description }}</p>
+<br />
+<h6 style="text-align: center;">Price {{ auction.aucrates.last.current_rate }}</h6>
 
-  <p style="text-align: center">{{ auction.description }}</p>
-  <br />
-  <h6 style="text-align: center">Price {{ rate.current_rate }}</h6>
-
-  <div>
-  <form action="{% url 'new_rate' category_id=auction.category_id.id auction_id=auction.id %}" method="post">
-
-        {% csrf_token %}
-        {{ rate_form.as_p }}
-        <input type="submit" value="Make rate">
-
-  </form>
-  </div>
-
-<!-- Watchlist form operations -->
-{% if wlist.first == None %}
-
-  <form action="{% url 'into_watchlist' category_id=auction.category_id.id auction_id=auction.id %}"
-    method="post">
-      {% csrf_token %}
-      <input type="hidden" name="auction" value="{{ auction.id }}">
-      <input type="submit" value="Track">
-  </form>
-
-{% else %}
-
-   <form action="{% url 'out_watchlist' category_id=auction.category_id.id auction_id=auction.id %}"
-    method="post">
-      {% csrf_token %}
-      <input type="hidden" name="auction" value="{{ auction.id }}">
-      <input type="submit" value="Do not track">
-  </form>
-
+{% if message %}
+  <div>{{ message }}</div>
 {% endif %}
 
-{% endblock %}
+<!-- Rate form -->
+<form
+  action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+  method="post"  style="display: flex;">
+  {% csrf_token %} {{ rate_form.as_p }}
+  <input type="submit" value="Make rate"/>
+</form>
+<br>
+
+<!-- Watchlist form -->
+{% if wlist.first == None %}
+<form
+  action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+  method="post">
+  {% csrf_token %}
+  <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
+  <input type="submit" value="Track" />
+</form>
+
+{% else %}
+<form
+  action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+  method="post">
+  {% csrf_token %}
+  <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
+  <input type="submit" value="Do not track" />
+</form>
+
+{% endif %} {% endblock %}

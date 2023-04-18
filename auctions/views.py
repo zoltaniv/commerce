@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django import forms
-from django.forms import ModelForm, Textarea
+from django.forms import ModelForm, Textarea, NumberInput
 from django.db import models
 
 from .models import User, Auction, Category, Watchlist,Rate
@@ -25,14 +25,11 @@ class RateForm(ModelForm):
     class Meta:
         model = Rate
         fields = ["current_rate"]
-        
 
 
 def index(request):
-    
     # Get all objects from database
     auctions = Auction.objects.all()
-    
     return render(request, "auctions/index.html", {"auctions": auctions})
 
 
@@ -112,6 +109,12 @@ def new_auction(request):
             user_id= User(request.user.id)
             )
         auction.save()
+        # Add first rate of lot as current rate
+        first_rate = Rate(
+            current_rate=request.POST.get("first_rate"),
+            lot_id=Auction(request.POST.get("lot")),
+            user_id=User(request.user.id))
+        first_rate.save()
         return redirect(reverse("index"))
     else:
         form = AuctionForm()
@@ -119,35 +122,41 @@ def new_auction(request):
     
     
 def auction_view(request, category_id, auction_id):
-    auction = Auction.objects.filter(id=auction_id).first()
-    wlist = Watchlist.objects.filter(user=request.user.id, auction=auction_id)
-    newrate = Rate.objects.filter(lot_id= auction_id).last()
+    # Get auction object
+    auction = Auction.objects.get(id=auction_id)
+    wlist = auction.aucwlist.filter(user=request.user.id)
+    rate = auction.aucrates.last()
     
-    return render(request, "auctions/auction_view.html", {
-        "auction": auction, "wlist": wlist, "rate_form": RateForm(), "rate": rate})
-
-
-def into_watchlist(request, category_id, auction_id):
-    wlist = Watchlist(user=User(request.user.id), auction=Auction(request.POST.get("auction")))
-    wlist.save()
-    
-    return redirect(reverse("auction_view", args=[category_id, auction_id]))
-
-
-def out_watchlist(request, category_id, auction_id):
-    wlist = Watchlist.objects.filter(user=request.user.id, auction=auction_id)
-    wlist.delete()
-    
-    return redirect(reverse("auction_view", args=[category_id, auction_id]))
-
-
-def new_rate(request, category_id, auction_id):
-    rate = Rate(
-        current_rate= request.POST.get("current_rate"),
-        lot_id= Auction(auction_id),
-        user_id= User(request.user.id)
-        )
-    rate.save()
-    
-    return redirect(reverse("auction_view", args=[category_id, auction_id]))
-    
+    if request.method == "GET":
+        return render(request, "auctions/auction_view.html", {
+            "auction": auction, "wlist": wlist, "rate_form": RateForm()})
+    else:
+        # For Rate form
+        if request.POST.get("current_rate"):
+            # Get last rate
+            rate = auction.aucrates.last()
+            # Get form value
+            proposed_rate = int(request.POST.get("current_rate"))
+            # Check proposed rate
+            if rate.current_rate >= proposed_rate:
+                return render(request, "auctions/auction_view.html", {
+                    "auction": auction, "wlist": wlist, "rate_form": RateForm(),
+                    "message": "You inserted too small value!"})
+            else:
+                rate.current_rate = request.POST.get("current_rate")
+                rate.save()
+                return render(request, "auctions/auction_view.html", {
+                    "auction": auction, "wlist": wlist, "rate_form": RateForm()})
+                
+        # For Watchlist form
+        if request.POST.get("watchlist_auction"):
+            if wlist.first() == None:
+                Watchlist(user=User(request.user.id),
+                          auction=Auction(auction_id)).save()
+                return render(request, "auctions/auction_view.html", {
+                    "auction": auction, "wlist": wlist, "rate_form": RateForm()})
+            else:
+                wlist.first().delete()
+                return render(request, "auctions/auction_view.html", {
+                    "auction": auction, "wlist": wlist, "rate_form": RateForm()})
+            
