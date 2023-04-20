@@ -1,0 +1,22 @@
+{% extends "auctions/layout.html" %}
+
+
+{% block body %}
+    <h2 style="text-align: center;">Watchlist</h2>
+
+    <div style="display:flex;">
+    {% for watch in watchlist %}
+        <div style="width: 20%; border:solid 1px black; margin: 10px;">
+
+            <a href="{% url 'auction_view' category_id=watch.auction.category_id.id auction_id=watch.auction.id %}"><h4 style="text-align: center;">{{ watch.auction.lot }}</h4></a>
+
+            <img src="/static/{{watch.auction.image.name}}" alt="Photo of object" style="width: 150px">
+
+            <p style="text-align: center;">{{ watch.auction.description }}</p>
+            <br>
+            <h6 style="text-align: center;">Price {{ watch.auction.aucrates.last.current_rate }} USD</h6>
+
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}

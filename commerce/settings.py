@@ -121,6 +121,4 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# MEDIA_ROOT = '/home/jonny/Стільниця/coding/env_commerce/commerce/auctions/media'
-
-# MEDIA_URL = '/media/'
+LOGIN_URL = '/login'

@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -7,7 +8,7 @@ from django import forms
 from django.forms import ModelForm, Textarea, NumberInput
 from django.db import models
 
-from .models import User, Auction, Category, Watchlist,Rate
+from .models import User, Auction, Category, Watchlist,Rate, Comment
 
 
 class AuctionForm(ModelForm):
@@ -20,12 +21,24 @@ class AuctionForm(ModelForm):
             "cols": 50,
             "style": "resize: none;"
             })}
-        
 class RateForm(ModelForm):
     class Meta:
         model = Rate
         fields = ["current_rate"]
-
+        widgets = {"current_rate": NumberInput(attrs={
+            "placeholder": "Rate size"
+        })}
+        
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["annotation"]
+        widgets = {"annotation": Textarea(attrs={
+            "placeholder": "Leave your comment here",
+            "rows": 5,
+            "cols": 50,
+            "style": "resize: none;"
+        })}
 
 def index(request):
     # Get all objects from database
@@ -97,6 +110,7 @@ def category(request, category_id):
     return render(request, "auctions/category.html", {"auctions": auction_list, "name": name})
 
 
+@login_required
 def new_auction(request):
     if request.method == "POST":
         # Save data in database
@@ -121,15 +135,18 @@ def new_auction(request):
         return render(request, "auctions/new_auction.html", {"form": form})
     
     
+@login_required
 def auction_view(request, category_id, auction_id):
     # Get auction object
     auction = Auction.objects.get(id=auction_id)
     wlist = auction.aucwlist.filter(user=request.user.id)
     rate = auction.aucrates.last()
+    # comments = Comment.objects.all()
     
     if request.method == "GET":
         return render(request, "auctions/auction_view.html", {
-            "auction": auction, "wlist": wlist, "rate_form": RateForm()})
+            "auction": auction, "wlist": wlist, "rate_form": RateForm(), 
+            "comment_form": CommentForm()})
     else:
         # For Rate form
         if request.POST.get("current_rate"):
@@ -141,22 +158,40 @@ def auction_view(request, category_id, auction_id):
             if rate.current_rate >= proposed_rate:
                 return render(request, "auctions/auction_view.html", {
                     "auction": auction, "wlist": wlist, "rate_form": RateForm(),
+                    "comment_form": CommentForm(),
                     "message": "You inserted too small value!"})
             else:
                 rate.current_rate = request.POST.get("current_rate")
                 rate.save()
-                return render(request, "auctions/auction_view.html", {
-                    "auction": auction, "wlist": wlist, "rate_form": RateForm()})
                 
         # For Watchlist form
         if request.POST.get("watchlist_auction"):
             if wlist.first() == None:
                 Watchlist(user=User(request.user.id),
                           auction=Auction(auction_id)).save()
-                return render(request, "auctions/auction_view.html", {
-                    "auction": auction, "wlist": wlist, "rate_form": RateForm()})
             else:
                 wlist.first().delete()
-                return render(request, "auctions/auction_view.html", {
-                    "auction": auction, "wlist": wlist, "rate_form": RateForm()})
+                
+        # Close the auction
+        if request.POST.get("close_auction"):
+            auction.is_active = False
+            auction.save()
             
+        # Add comment
+        if request.POST.get("annotation"):
+            Comment(annotation= request.POST.get("annotation"),
+                    auction= Auction(auction_id), 
+                    user= User(request.user.id)).save()
+            # comments = Comment.objects.all()
+        
+        return render(request, "auctions/auction_view.html", {
+                "auction": auction, "wlist": wlist, "rate_form": RateForm(),
+                "comment_form": CommentForm()})
+
+
+@login_required 
+def watchlist_view(request):
+    user = User.objects.get(id= request.user.id)
+    watchlist = user.usewlist.all()
+    
+    return render(request, "auctions/watchlist.html", {"watchlist": watchlist})

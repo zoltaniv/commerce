@@ -1,47 +1,99 @@
-{% extends "auctions/layout.html" %} {% block body %}
+{% extends "auctions/layout.html" %} 
 
-<h4 style="text-align: center">{{ auction.lot }}</h4>
 
-<img
-  src="/static/{{auction.image.name}}"
-  alt="Photo of object"
-  style="width: 200px; display: block; margin-left: auto; margin-right: auto"
-/>
+{% block body %}
 
-<p style="text-align: center;">{{ auction.description }}</p>
-<br />
-<h6 style="text-align: center;">Price {{ auction.aucrates.last.current_rate }}</h6>
+    <!-- If user is owner of the most rate of the auction -->
+    {% if auction.is_active == False and auction.aucrates.last.user_id.id == user.id %}
+      <div style="text-align: center;">
+        <h2>You are the winer of this auction!</h2>
+        <h2> Congratulations! </h2>
+      </div>
+    {% endif %}
+    <br>
+    <h4 style="text-align: center">{{ auction.lot }}</h4>
+    <h6 style="text-align: center;">Starting price {{ auction.first_rate }} USD</h6>
 
-{% if message %}
-  <div>{{ message }}</div>
-{% endif %}
+    <img
+      src="/static/{{auction.image.name}}"
+      alt="Photo of object"
+      style="width: 200px; display: block; margin-left: auto; margin-right: auto"
+    />
 
-<!-- Rate form -->
-<form
-  action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
-  method="post"  style="display: flex;">
-  {% csrf_token %} {{ rate_form.as_p }}
-  <input type="submit" value="Make rate"/>
-</form>
-<br>
+    <p style="text-align: center;">{{ auction.description }}</p>
+    <br />
+    {% if auction.is_active == False %}
+      <h3 style="text-align: center;">Sold for {{ auction.aucrates.last.current_rate }} USD</h3>
+    {% else %}
+      <h6 style="text-align: center;">Highest rate  {{ auction.aucrates.last.current_rate }} USD</h6>
+    {% endif %}
+    {% if message %}
+      <div>{{ message }}</div>
+    {% endif %}
 
-<!-- Watchlist form -->
-{% if wlist.first == None %}
-<form
-  action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
-  method="post">
-  {% csrf_token %}
-  <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
-  <input type="submit" value="Track" />
-</form>
+    <!-- If auction is active -->
+    {% if auction.is_active == True %}
+        <!-- Rate form -->
+        <form
+          action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+          method="post"  style="display: flex;">
+          {% csrf_token %} {{ rate_form.as_p }}
+          <input type="submit" value="Make rate"/>
+        </form>
+        <br>
 
-{% else %}
-<form
-  action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
-  method="post">
-  {% csrf_token %}
-  <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
-  <input type="submit" value="Do not track" />
-</form>
+        <!-- Watchlist form -->
+        {% if wlist.first == None %}
+        <form
+          action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+          method="post">
+          {% csrf_token %}
+          <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
+          <input type="submit" value="Add to watchlist" />
+        </form>
 
-{% endif %} {% endblock %}
+        {% else %}
+        <form
+          action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+          method="post">
+          {% csrf_token %}
+          <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
+          <input type="submit" value="Delete from watchlist" />
+        </form>
+        {% endif %}
+
+        {% if auction.user_id.id == user.id and auction.is_active == True %}
+          <form
+          action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+          method="post">
+          {% csrf_token %}
+          <input type="hidden" name="close_auction" value="{{ auction.id }}" />
+          <input type="submit" value="Close auction" />
+          </form>
+        {% endif %}
+
+        <!-- Comment form -->
+        <form
+          action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+          method="post"  style="display: flex;">
+          {% csrf_token %} 
+          {{ comment_form.as_p }}
+          <input type="submit" value="Make comment"/>
+        </form>
+    {% endif %}
+
+    <!-- All comments -->
+    {% if auction.auccomments.first %}
+
+      <h3>Comments:</h3>
+      {% for comment in auction.auccomments.all %}
+        <p> {{ comment.user.username }}:  {{ comment.annotation }} </p>
+      {% endfor %}
+
+    {% else %}
+
+      <p> No comments. </p>
+
+    {% endif %}
+
+{% endblock %}
