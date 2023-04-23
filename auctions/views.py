@@ -15,7 +15,7 @@ class AuctionForm(ModelForm):
     class Meta:
         model = Auction
         fields = "__all__"
-        exclude = ["user_id", "is_active"]
+        exclude = ["is_active"]
         widgets = {"description": Textarea(attrs={
             "rows": 5, 
             "cols": 10,

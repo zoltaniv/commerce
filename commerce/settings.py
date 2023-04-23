@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'auctions',
+    'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -122,3 +123,5 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 LOGIN_URL = '/login'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
