@@ -2,19 +2,19 @@
 
 
 {% block body %}
-    <h2 style="text-align: center;">{{name}}</h2>
+    <h2 class="display-6 text-center">{{name}}</h2>
 
-    <div style="display:flex;">
+    <div class="row row-cols-5 justify-content-md-center">
     {% for auction in auctions %}
-        <div style="width: 20%; border:solid 1px black; margin: 10px;">
+        <div class="col p-2 m-2 border text-bg-white bg-white">
 
-            <a href="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"><h4 style="text-align: center;">{{ auction.lot }}</h4></a>
+            <a href="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"><h3 class="h3 text-center">{{ auction.lot }}</h3></a>
 
-            <img src="/static/{{auction.image.name}}" alt="Photo of object" style="width: 200px">
+            <a href="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"><img class="mx-auto d-block img-fluid m-2" src="/static/{{auction.image.name}}" alt="Photo of object" ></a>
 
-            <p style="text-align: center;">{{ auction.description }}</p>
+            <p class="text-center">{{ auction.description }}</p>
             <br>
-            <h6 style="text-align: center;">Price {{ auction.aucrates.last.current_rate }} USD</h6>
+            <h5 class="h5 text-center"><b>Price {{ auction.aucrates.last.current_rate }} USD</b></h5>
 
         </div>
     {% endfor %}

@@ -2,21 +2,21 @@
 
 
 {% block body %}
-    <h2 style="text-align: center;">Watchlist</h2>
+    <h2 class="display-6 text-center">Watchlist</h2>
 
-    <div style="display:flex;">
-    {% for watch in watchlist %}
-        <div style="width: 20%; border:solid 1px black; margin: 10px;">
+    <div class="row row-cols-5 justify-content-md-center">
+        {% for watch in watchlist %}
+            <div class="col p-2 m-2 border text-bg-white bg-white">
 
-            <a href="{% url 'auction_view' category_id=watch.auction.category_id.id auction_id=watch.auction.id %}"><h4 style="text-align: center;">{{ watch.auction.lot }}</h4></a>
+                <a href="{% url 'auction_view' category_id=watch.auction.category_id.id auction_id=watch.auction.id %}"><h4 class="h3 text-center">{{ watch.auction.lot }}</h4></a>
 
-            <img src="/static/{{watch.auction.image.name}}" alt="Photo of object" style="width: 150px">
+                <a href="{% url 'auction_view' category_id=watch.auction.category_id.id auction_id=watch.auction.id %}"><img src="/static/{{watch.auction.image.name}}" alt="Photo of object" class="mx-auto d-block img-fluid m-2"></a>
 
-            <p style="text-align: center;">{{ watch.auction.description }}</p>
-            <br>
-            <h6 style="text-align: center;">Price {{ watch.auction.aucrates.last.current_rate }} USD</h6>
+                <p class="text-center">{{ watch.auction.description }}</p>
+                <br>
+                <h6 class="h5 text-center"><b>Price {{ watch.auction.aucrates.last.current_rate }} USD</b></h6>
 
-        </div>
-    {% endfor %}
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}

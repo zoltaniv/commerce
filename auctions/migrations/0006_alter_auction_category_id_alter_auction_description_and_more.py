@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='auction',
             name='image',
-            field=models.ImageField(upload_to=''),
+            field=models.ImageField(upload_to='auctions/images'),
         ),
         migrations.AlterField(
             model_name='auction',

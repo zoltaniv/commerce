@@ -22,10 +22,10 @@ class Auction(models.Model):
     first_rate = models.IntegerField(verbose_name="Starting price")
     category_id = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name="catauctions", verbose_name="Product categories")
-    image = models.ImageField(upload_to='auctions/images')
+    image = models.ImageField(upload_to="auctions/images")
     user_id = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="useauctions")
-    is_active = models.BooleanField(True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.id} {self.category_id}: {self.lot}"

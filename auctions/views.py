@@ -8,25 +8,27 @@ from django import forms
 from django.forms import ModelForm, Textarea, NumberInput
 from django.db import models
 
-from .models import User, Auction, Category, Watchlist,Rate, Comment
+from .models import User, Auction, Category, Watchlist, Rate, Comment
 
 
 class AuctionForm(ModelForm):
     class Meta:
         model = Auction
         fields = "__all__"
-        exclude = ["user_id"]
+        exclude = ["user_id", "is_active"]
         widgets = {"description": Textarea(attrs={
             "rows": 5, 
-            "cols": 50,
-            "style": "resize: none;"
+            "cols": 10,
+            "style": "resize: none;",
+            "class": "form-control"
             })}
 class RateForm(ModelForm):
     class Meta:
         model = Rate
         fields = ["current_rate"]
         widgets = {"current_rate": NumberInput(attrs={
-            "placeholder": "Rate size"
+            "placeholder": "Input rate",
+            "class": "form-control"
         })}
         
 class CommentForm(ModelForm):
@@ -34,7 +36,7 @@ class CommentForm(ModelForm):
         model = Comment
         fields = ["annotation"]
         widgets = {"annotation": Textarea(attrs={
-            "placeholder": "Leave your comment here",
+            "placeholder": "Input your comment here",
             "rows": 5,
             "cols": 50,
             "style": "resize: none;"
@@ -43,12 +45,15 @@ class CommentForm(ModelForm):
 def index(request):
     # Get all objects from database
     auctions = Auction.objects.all()
-    return render(request, "auctions/index.html", {"auctions": auctions})
+    # Get all objects from database
+    categories = Category.objects.all()
+
+    return render(request, "auctions/index.html", {"auctions": auctions, "categories": categories})
 
 
 def login_view(request):
+    categories = Category.objects.all()
     if request.method == "POST":
-
         # Attempt to sign user in
         username = request.POST["username"]
         password = request.POST["password"]
@@ -59,11 +64,11 @@ def login_view(request):
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "auctions/login.html", {
-                "message": "Invalid username and/or password."
+            return render(request, "auctions/login.html", {"categories": categories,
+                "message": "Invalid username and/or password"
             })
     else:
-        return render(request, "auctions/login.html")
+        return render(request, "auctions/login.html", {"categories": categories})
 
 
 def logout_view(request):
@@ -94,7 +99,8 @@ def register(request):
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "auctions/register.html")
+        categories = Category.objects.all()
+        return render(request, "auctions/register.html", {"categories": categories})
 
 
 def category_list(request):
@@ -103,36 +109,37 @@ def category_list(request):
 
 
 def category(request, category_id):
-    auction_list = Auction.objects.filter(category_id= category_id)
+    auctions = Auction.objects.filter(category_id= category_id)
     category = Category.objects.filter(id=category_id)
     name = category.first().name
     
-    return render(request, "auctions/category.html", {"auctions": auction_list, "name": name})
+    categories = Category.objects.all()
+    
+    return render(request, "auctions/category.html", {"auctions": auctions, "categories": categories, "name": name})
 
 
 @login_required
 def new_auction(request):
     if request.method == "POST":
         # Save data in database
-        auction = Auction(
-            lot= request.POST.get("lot"),
+        Auction(lot= request.POST.get("lot"),
             description= request.POST.get("description"),
             first_rate= request.POST.get("first_rate"),
             category_id= Category(request.POST.get("category_id")),
             image= request.POST.get("image"),
             user_id= User(request.user.id)
-            )
-        auction.save()
+            ).save()
+        
         # Add first rate of lot as current rate
-        first_rate = Rate(
-            current_rate=request.POST.get("first_rate"),
-            lot_id=Auction(request.POST.get("lot")),
-            user_id=User(request.user.id))
-        first_rate.save()
+        Rate(current_rate= request.POST.get("first_rate"),
+            lot_id= Auction(request.POST.get("lot")),
+            user_id= User(request.user.id)).save()
+        
         return redirect(reverse("index"))
     else:
         form = AuctionForm()
-        return render(request, "auctions/new_auction.html", {"form": form})
+        categories = Category.objects.all()
+        return render(request, "auctions/new_auction.html", {"form": form, "categories": categories})
     
     
 @login_required
@@ -142,11 +149,12 @@ def auction_view(request, category_id, auction_id):
     wlist = auction.aucwlist.filter(user=request.user.id)
     rate = auction.aucrates.last()
     # comments = Comment.objects.all()
+    categories = Category.objects.all()
     
     if request.method == "GET":
         return render(request, "auctions/auction_view.html", {
             "auction": auction, "wlist": wlist, "rate_form": RateForm(), 
-            "comment_form": CommentForm()})
+            "comment_form": CommentForm(), "categories": categories})
     else:
         # For Rate form
         if request.POST.get("current_rate"):
@@ -158,7 +166,7 @@ def auction_view(request, category_id, auction_id):
             if rate.current_rate >= proposed_rate:
                 return render(request, "auctions/auction_view.html", {
                     "auction": auction, "wlist": wlist, "rate_form": RateForm(),
-                    "comment_form": CommentForm(),
+                    "comment_form": CommentForm(), "categories": categories,
                     "message": "You inserted too small value!"})
             else:
                 rate.current_rate = request.POST.get("current_rate")
@@ -186,12 +194,13 @@ def auction_view(request, category_id, auction_id):
         
         return render(request, "auctions/auction_view.html", {
                 "auction": auction, "wlist": wlist, "rate_form": RateForm(),
-                "comment_form": CommentForm()})
+                "comment_form": CommentForm(), "categories": categories})
 
 
 @login_required 
 def watchlist_view(request):
     user = User.objects.get(id= request.user.id)
     watchlist = user.usewlist.all()
+    categories = Category.objects.all()
     
-    return render(request, "auctions/watchlist.html", {"watchlist": watchlist})
+    return render(request, "auctions/watchlist.html", {"watchlist": watchlist, "categories": categories})

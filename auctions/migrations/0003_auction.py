@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('lot', models.CharField(max_length=64)),
                 ('description', models.CharField(max_length=256)),
                 ('first_rate', models.IntegerField()),
-                ('image', models.FileField(upload_to='')),
+                ('image', models.FileField(upload_to='auctions/images')),
                 ('category_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='categories', to='auctions.category')),
                 ('user_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='users', to=settings.AUTH_USER_MODEL)),
             ],
