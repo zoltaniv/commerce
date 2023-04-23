@@ -14,8 +14,8 @@ from .models import User, Auction, Category, Watchlist, Rate, Comment
 class AuctionForm(ModelForm):
     class Meta:
         model = Auction
-        fields = "__all__"
-        exclude = ["is_active"]
+        fields = ["lot", "description", "first_rate",
+                  "category_id", "image"]
         widgets = {"description": Textarea(attrs={
             "rows": 5, 
             "cols": 10,
@@ -132,7 +132,7 @@ def new_auction(request):
         
         # Add first rate of lot as current rate
         Rate(current_rate= request.POST.get("first_rate"),
-            lot_id= Auction(request.POST.get("lot")),
+            lot_id= Auction.objects.last(),
             user_id= User(request.user.id)).save()
         
         return redirect(reverse("index"))
