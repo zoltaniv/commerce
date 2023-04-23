@@ -5,7 +5,7 @@
 
   <!-- If user is owner of the most rate of the auction -->
   {% if auction.is_active == False and auction.aucrates.last.user_id.id == user.id %}
-    <div class="text-center">
+    <div class="text-center mt-3 bg-success text-white p-3">
       <h2>You are the winer of this auction!</h2>
       <h2> Congratulations! </h2>
     </div>
@@ -17,7 +17,7 @@
 
     <div class="col-4">
       <img
-      src="/static/{{auction.image.name}}"
+      src="/static/auctions/images/{{auction.image.name}}"
       alt="Photo of object"
       class="float-start m-2" style="width: 400px;"/>
     </div>

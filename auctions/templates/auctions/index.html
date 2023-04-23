@@ -11,7 +11,7 @@
 
                     <a href="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"><h3 class="h3 text-center">{{ auction.lot }}</h3></a>
 
-                    <a href="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"><img class="mx-auto d-block img-fluid m-2" src="/static/{{auction.image.name}}" alt="Photo of object" ></a>
+                    <a href="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"><img class="mx-auto d-block img-fluid m-2" src="/static/auctions/images/{{auction.image.name}}" alt="Photo of object" ></a>
 
                     <p class="text-center">{{ auction.description }}</p>
                     <br>

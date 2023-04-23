@@ -158,8 +158,6 @@ def auction_view(request, category_id, auction_id):
     else:
         # For Rate form
         if request.POST.get("current_rate"):
-            # Get last rate
-            rate = auction.aucrates.last()
             # Get form value
             proposed_rate = int(request.POST.get("current_rate"))
             # Check proposed rate
@@ -170,6 +168,7 @@ def auction_view(request, category_id, auction_id):
                     "message": "You inserted too small value!"})
             else:
                 rate.current_rate = request.POST.get("current_rate")
+                rate.user_id = User(request.user.id)
                 rate.save()
                 
         # For Watchlist form

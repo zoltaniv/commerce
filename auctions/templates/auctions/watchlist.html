@@ -10,7 +10,7 @@
 
                 <a href="{% url 'auction_view' category_id=watch.auction.category_id.id auction_id=watch.auction.id %}"><h4 class="h3 text-center">{{ watch.auction.lot }}</h4></a>
 
-                <a href="{% url 'auction_view' category_id=watch.auction.category_id.id auction_id=watch.auction.id %}"><img src="/static/{{watch.auction.image.name}}" alt="Photo of object" class="mx-auto d-block img-fluid m-2"></a>
+                <a href="{% url 'auction_view' category_id=watch.auction.category_id.id auction_id=watch.auction.id %}"><img src="/static/auctions/images/{{watch.auction.image.name}}" alt="Photo of object" class="mx-auto d-block img-fluid m-2"></a>
 
                 <p class="text-center">{{ watch.auction.description }}</p>
                 <br>
