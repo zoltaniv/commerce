@@ -96,38 +96,50 @@
   
   <!-- If auction is active -->
   {% if auction.is_active == True %}
-      <!-- Watchlist form -->
-      {% if wlist.first == None %}
-        <form
-          action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
-          method="post" class="row">
-          {% csrf_token %}
-          <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
-          <div class="col-auto">
-            <input type="submit" value="Add to watchlist" class="btn btn-primary mb-3"/>
-          </div>
-        </form>
-      {% else %}
-        <form
-          action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
-          method="post" class="row">
-          {% csrf_token %}
-          <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
-          <div class="col-auto">
-            <input type="submit" value="Delete from watchlist" class="btn btn-primary mb-3"/>
-          </div>
-        </form>
-      {% endif %}
-
-      {% if auction.user_id.id == user.id and auction.is_active == True %}
-        <form
+    <!-- Watchlist form -->
+    {% if wlist.first == None %}
+      <form
         action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
-        method="post">
+        method="post" class="row">
         {% csrf_token %}
-        <input type="hidden" name="close_auction" value="{{ auction.id }}" />
-        <input type="submit" value="Close auction" />
-        </form>
-      {% endif %}
+        <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
+        <div class="col-auto">
+          <input type="submit" value="Add to watchlist" class="btn btn-primary mb-3"/>
+        </div>
+      </form>
+    {% else %}
+      <form
+        action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+        method="post" class="row">
+        {% csrf_token %}
+        <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
+        <div class="col-auto">
+          <input type="submit" value="Delete from watchlist" class="btn btn-primary mb-3"/>
+        </div>
+      </form>
+    {% endif %}
+
+    {% if auction.user_id.id == user.id and auction.is_active == True %}
+      <form
+      action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+      method="post">
+      {% csrf_token %}
+      <input type="hidden" name="close_auction" value="{{ auction.id }}" />
+      <input type="submit" value="Close auction" />
+      </form>
+    {% endif %}
+  {% else %}
+    {% if wlist.first %}
+      <form
+        action="{% url 'auction_view' category_id=auction.category_id.id auction_id=auction.id %}"
+        method="post" class="row">
+        {% csrf_token %}
+        <input type="hidden" name="watchlist_auction" value="{{ auction.id }}" />
+        <div class="col-auto">
+          <input type="submit" value="Delete from watchlist" class="btn btn-primary mb-3"/>
+        </div>
+      </form>
+    {% endif %}
   {% endif %}
 
 {% endblock %}
