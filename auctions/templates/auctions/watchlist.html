@@ -14,7 +14,11 @@
 
                 <p class="text-center">{{ watch.auction.description }}</p>
                 <br>
-                <h6 class="h5 text-center"><b>Price {{ watch.auction.aucrates.last.current_rate }} USD</b></h6>
+                {% if auction.is_active %}
+                    <h5 class="h5 text-center"><b>Price {{ auction.aucrates.last.current_rate }} USD</b></h5>
+                {% else %}
+                    <h1 class="text-center"><b>SOLD</b></h1>
+                {% endif %}
 
             </div>
         {% endfor %}
